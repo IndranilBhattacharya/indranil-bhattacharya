@@ -8,14 +8,13 @@ import cn from "@/utils/cn";
  */
 export const Loading: React.FC = () => {
   return (
-    <div
+    <progress
       className={cn(
         "fixed inset-0 z-50",
         "flex items-center justify-center",
         "bg-black bg-opacity-90",
         "transition-opacity duration-500"
       )}
-      role="progressbar"
       aria-valuetext="Loading portfolio content"
     >
       <div className="text-center">
@@ -46,6 +45,6 @@ export const Loading: React.FC = () => {
           Preparing your experience...
         </p>
       </div>
-    </div>
+    </progress>
   );
 };
