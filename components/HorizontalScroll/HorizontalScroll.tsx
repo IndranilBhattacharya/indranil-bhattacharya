@@ -6,126 +6,148 @@ import cn from "@/utils/cn";
 
 import { sections } from "./data";
 import { SectionContent } from "./SectionContent";
-import { SCROLL_CONFIG } from "./constants";
+import { ScrollTimeline } from "./ScrollTimeline";
 
-// We'll register GSAP plugins in a useEffect to avoid SSR issues
+// Register GSAP plugins in browser environment
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
 const HorizontalScroll: React.FC = () => {
-  // Track mounting state for handling animations
+  // Track mounting state and scroll progress
   const [isMounted, setIsMounted] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
-  // Create refs for DOM elements
-  const mainContainerRef = useRef<HTMLDivElement>(null);
-  const sectionsContainerRef = useRef<HTMLDivElement>(null);
-  const sectionsRef = useRef<Array<HTMLDivElement | null>>([]);
+  // Create refs for our container elements
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const sectionsRef = useRef<(HTMLDivElement | null)[]>([]);
 
-  // Initialize GSAP plugins and mounting state
+  // Initialize on mount
   useEffect(() => {
-    // Register plugins after component mounts
-    gsap.registerPlugin(ScrollTrigger);
-    // Set mounted state
     setIsMounted(true);
-    // Initialize sections array
     sectionsRef.current = Array(sections.length).fill(null);
   }, []);
 
-  // Set up animations after component is mounted
+  // Set up scroll animations after mount
   useEffect(() => {
-    if (!isMounted) return;
+    if (!isMounted || !wrapperRef.current || !containerRef.current) return;
 
-    // Create animation context
+    // Create animation context for better cleanup
     const ctx = gsap.context(() => {
-      if (!mainContainerRef.current || !sectionsContainerRef.current) return;
-
-      // Create main scrolling timeline
+      // Create the main scrolling timeline
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: mainContainerRef.current,
-          pin: true,
-          scrub: 1,
-          start: "top top",
-          end: `+=${SCROLL_CONFIG.SCROLL_LENGTH}`,
-          invalidateOnRefresh: true,
+          trigger: wrapperRef.current,
+          pin: true, // Pin the section while scrolling horizontally
+          scrub: 1, // Smooth scrolling
+          start: "top top", // Start at the top of the section
+          end: () => {
+            // Calculate end point based on content width
+            const contentWidth = containerRef.current?.scrollWidth || 0;
+            const viewportWidth = window.innerWidth;
+            return `+=${contentWidth - viewportWidth}`;
+          },
+          invalidateOnRefresh: true, // Recalculate on resize
+          onUpdate: (self) => {
+            // Update scroll progress for timeline
+            setScrollProgress(self.progress);
+          },
         },
       });
 
-      // Animate horizontal scroll
-      tl.to(sectionsContainerRef.current, {
+      // Create the horizontal scrolling animation
+      tl.to(containerRef.current, {
         x: () => {
-          const totalWidth = sectionsContainerRef.current?.scrollWidth || 0;
+          // Calculate the exact distance to scroll
+          const contentWidth = containerRef.current?.scrollWidth || 0;
           const viewportWidth = window.innerWidth;
-          return -(totalWidth - viewportWidth);
+          return -(contentWidth - viewportWidth);
         },
-        ease: "none",
+        ease: "none", // Linear scrolling
       });
 
-      // Animate section contents
+      // Animate content elements as they come into view
       sectionsRef.current.forEach((section) => {
         if (!section) return;
 
         const elements = section.querySelectorAll(".animate-in");
 
-        gsap.from(elements, {
-          y: SCROLL_CONFIG.ANIMATION_OFFSET,
-          opacity: 0,
-          duration: SCROLL_CONFIG.DURATION,
-          stagger: SCROLL_CONFIG.STAGGER_DELAY,
-          scrollTrigger: {
-            trigger: section,
-            containerAnimation: tl,
-            start: "left center",
-            toggleActions: "play none none reverse",
+        gsap.fromTo(
+          elements,
+          {
+            opacity: 0,
+            y: 20,
           },
-        });
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: section,
+              containerAnimation: tl,
+              start: "left center",
+              toggleActions: "play none none reset",
+            },
+          }
+        );
       });
     });
 
     // Cleanup function
-    return () => {
-      ctx.revert();
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-    };
-  }, [isMounted]); // Only run when mounted state changes
+    return () => ctx.revert();
+  }, [isMounted]);
 
-  // Initial render structure that matches on both server and client
-  const renderContent = () => (
+  // Helper function for setting section refs
+  const setSectionRef = (index: number) => (element: HTMLDivElement | null) => {
+    if (sectionsRef.current) {
+      sectionsRef.current[index] = element;
+    }
+  };
+
+  return (
     <div
-      ref={mainContainerRef}
-      className="relative w-full overflow-hidden min-h-screen"
+      ref={wrapperRef}
+      className="relative w-full overflow-hidden min-h-screen bg-black"
     >
+      {/* Progress indicator */}
+      <ScrollTimeline progress={scrollProgress} />
+
+      {/* Scrolling container */}
       <div
-        ref={sectionsContainerRef}
+        ref={containerRef}
         className={cn(
           "flex h-full",
           "transform will-change-transform",
-          isMounted
-            ? "transition-opacity duration-500 opacity-100"
-            : "opacity-0"
+          "transition-opacity duration-500",
+          isMounted ? "opacity-100" : "opacity-0"
         )}
-        style={{ width: `${sections.length * 100}vw` }}
+        style={{
+          width: `${sections.length * 100}vw`, // Total width based on number of sections
+          height: "100vh", // Full viewport height
+        }}
       >
-        {sections.map((section, i) => (
+        {sections.map((section, index) => (
           <div
             key={section.id}
-            ref={(element: HTMLDivElement | null) => {
-              if (sectionsRef.current) {
-                sectionsRef.current[i] = element;
-              }
-            }}
+            ref={setSectionRef(index)}
             className={cn(
-              "w-screen h-full flex flex-col justify-center",
-              "px-20 py-16",
-              "transform-gpu",
-              section.backgroundColor
+              "w-screen h-full", // Each section takes full viewport width
+              "flex items-center justify-center", // Center content
+              "px-20", // Horizontal padding
+              section.backgroundColor // Background color from section data
             )}
           >
-            <SectionContent section={section} isClient={isMounted} />
+            <div className="relative">
+              <SectionContent section={section} isClient={isMounted} />
+            </div>
           </div>
         ))}
       </div>
     </div>
   );
-
-  return renderContent();
 };
 
 export default HorizontalScroll;

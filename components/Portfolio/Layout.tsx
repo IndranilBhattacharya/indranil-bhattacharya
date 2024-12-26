@@ -9,54 +9,77 @@ import { ProjectsSection } from "./sections/ProjectsSection";
 import { SkillsSection } from "./sections/SkillsSection";
 import { TestimonialSection } from "./sections/TestimonialSection";
 
-// We only register GSAP plugins in the browser
+// Register GSAP only in browser environment
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
 export const PortfolioLayout: React.FC = () => {
-  // Adding a mount state to ensure DOM is ready
   const [isMounted, setIsMounted] = useState(false);
-
-  // Creating refs for our sections
   const sectionsRef = useRef<HTMLDivElement[]>([]);
 
-  // When component mounts, we'll set up our animations
   useEffect(() => {
     setIsMounted(true);
 
-    // Return early if we're not mounted yet
     if (!isMounted) return;
 
-    // Create a GSAP context for better cleanup
+    // Create a GSAP context for better animation management
     const ctx = gsap.context(() => {
-      // Let's wait a small bit to ensure DOM is fully ready
+      // Allow DOM to settle before initializing animations
       setTimeout(() => {
-        // We'll work with each section that needs parallax
         sectionsRef.current.forEach((section) => {
           if (!section) return;
 
-          // First, let's ensure our section content is ready
           const content = section.querySelector(".section-content");
           if (!content) return;
 
-          // Create our parallax effect
-          gsap.to(content, {
-            y: "-20%", // Move up by 20% of its height
-            ease: "none",
+          // Create a timeline for each section's animations
+          const tl = gsap.timeline({
             scrollTrigger: {
               trigger: section,
-              start: "top bottom", // Start when section top hits viewport bottom
-              end: "bottom top", // End when section bottom hits viewport top
+              start: "top bottom", // Start when section's top reaches bottom of viewport
+              end: "bottom top", // End when section's bottom reaches top of viewport
               scrub: 1, // Smooth scrolling effect
               markers: process.env.NODE_ENV === "development",
+              // For smoother animations
+              invalidateOnRefresh: true,
             },
           });
 
-          // Now animate the content elements
+          // First, set the initial state
+          gsap.set(content, {
+            y: "20%", // Start slightly moved down
+            scale: 0.95, // Start slightly smaller
+            opacity: 0.5, // Start partially transparent
+          });
+
+          // Then animate as the section comes into view
+          tl.fromTo(
+            content,
+            {
+              y: "20%", // Start position
+              scale: 0.95,
+              opacity: 0.5,
+            },
+            {
+              y: "0%", // Move to natural position
+              scale: 1, // Scale to full size
+              opacity: 1, // Fade to full opacity
+              ease: "none", // Linear animation for smooth scrolling
+              // When section is in the middle of the viewport
+              duration: 0.5,
+            }
+          ).to(content, {
+            y: "-10%", // Move slightly up as it exits
+            scale: 0.95, // Scale down slightly
+            opacity: 0.5, // Fade out partially
+            ease: "none",
+            duration: 0.5,
+          });
+
+          // Animate individual elements within the section
           const elements = content.children;
           if (elements.length) {
-            // Create reveal animation
             gsap.fromTo(
               elements,
               {
@@ -70,24 +93,23 @@ export const PortfolioLayout: React.FC = () => {
                 stagger: 0.2,
                 scrollTrigger: {
                   trigger: section,
-                  start: "top 80%",
+                  start: "top 80%", // Start when section is 80% in view
                   toggleActions: "play none none reset",
                 },
               }
             );
           }
         });
-      }, 100); // Small delay to ensure everything is ready
+      }, 100);
     });
 
-    // Cleanup when component unmounts
     return () => {
       ctx.revert();
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
-  }, [isMounted]); // Only run when mounted state changes
+  }, [isMounted]);
 
-  // Helper function to add sections to our refs array
+  // Helper function to manage section refs
   const addToRefs = (el: HTMLDivElement | null) => {
     if (el && !sectionsRef.current.includes(el)) {
       sectionsRef.current.push(el);
@@ -106,7 +128,7 @@ export const PortfolioLayout: React.FC = () => {
         <HorizontalScroll />
       </section>
 
-      {/* Projects Section with parallax */}
+      {/* Projects Section */}
       <section
         ref={addToRefs}
         className="relative min-h-screen overflow-hidden bg-black py-20"
@@ -118,7 +140,7 @@ export const PortfolioLayout: React.FC = () => {
         </div>
       </section>
 
-      {/* Skills Section with parallax */}
+      {/* Skills Section */}
       <section
         ref={addToRefs}
         className="relative min-h-screen overflow-hidden bg-gray-900 py-20"
@@ -130,7 +152,7 @@ export const PortfolioLayout: React.FC = () => {
         </div>
       </section>
 
-      {/* Testimonials Section with parallax */}
+      {/* Testimonials Section */}
       <section
         ref={addToRefs}
         className="relative min-h-screen overflow-hidden bg-black py-20"
