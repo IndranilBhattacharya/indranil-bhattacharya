@@ -8,6 +8,7 @@ import HorizontalScroll from "@/components/HorizontalScroll";
 import { ProjectsSection } from "./sections/ProjectsSection";
 import { SkillsSection } from "./sections/SkillsSection";
 import { TestimonialSection } from "./sections/TestimonialSection";
+// import { useLenis } from "@/hooks/useLenis";
 
 // Register GSAP only in browser environment
 if (typeof window !== "undefined") {
@@ -40,7 +41,7 @@ export const PortfolioLayout: React.FC = () => {
               start: "top bottom", // Start when section's top reaches bottom of viewport
               end: "bottom top", // End when section's bottom reaches top of viewport
               scrub: 1, // Smooth scrolling effect
-              markers: process.env.NODE_ENV === "development",
+              markers: false,
               // For smoother animations
               invalidateOnRefresh: true,
             },
