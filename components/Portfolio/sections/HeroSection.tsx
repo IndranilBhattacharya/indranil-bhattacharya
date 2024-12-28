@@ -1,92 +1,74 @@
 // components/Portfolio/sections/HeroSection.tsx
-import { motion } from "framer-motion";
-import cn from "@/utils/cn";
+import React, { useEffect, useRef, useState } from "react";
+import { motion, useSpring } from "framer-motion";
 
 export const HeroSection = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const springConfig = { damping: 5, stiffness: 200, mass: 0.5 };
+  const cursorX = useSpring(0, springConfig);
+  const cursorY = useSpring(0, springConfig);
+  const cursorSize = useSpring(60, springConfig);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (rect) {
+      // Get cursor position relative to container
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      cursorX.set(x);
+      cursorY.set(y);
+    }
+  };
+
   return (
-    <motion.div
-      className={cn(
-        "relative w-full max-w-7xl mx-auto px-6",
-        "flex flex-col items-center justify-center text-center",
-        "min-h-screen"
-      )}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
-    >
-      <motion.h1
-        className={cn(
-          "text-7xl font-bold mb-6",
-          "bg-clip-text text-transparent",
-          "bg-gradient-to-r from-blue-500 to-purple-500"
-        )}
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
+    <div className="w-screen h-screen grid grid-cols-2">
+      <div
+        ref={containerRef}
+        className="relative h-full w-full flex items-center justify-center overflow-hidden"
+        onMouseMove={handleMouseMove}
       >
-        Creative Developer
-      </motion.h1>
-
-      <motion.p
-        className="text-xl text-gray-300 max-w-2xl mb-12"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.4 }}
-      >
-        Crafting immersive digital experiences through code and creativity.
-        Specializing in interactive web development and smooth animations.
-      </motion.p>
-
-      <motion.div
-        className="flex gap-6"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.6 }}
-      >
-        <button
-          className={cn(
-            "px-8 py-3 rounded-full",
-            "bg-blue-500 hover:bg-blue-600",
-            "transition-colors duration-300"
-          )}
+        {/* Text with magnifying glass effect */}
+        <h1
+          className="text-8xl font-bold leading-tight text-white"
+          onMouseEnter={() => cursorSize.set(150)}
+          onMouseLeave={() => cursorSize.set(60)}
+          style={{
+            transform: "scale(1)",
+            transformOrigin: "center center",
+          }}
         >
-          View Projects
-        </button>
-        <button
-          className={cn(
-            "px-8 py-3 rounded-full",
-            "border border-white/20",
-            "hover:bg-white/10",
-            "transition-colors duration-300"
-          )}
-        >
-          Contact Me
-        </button>
-      </motion.div>
+          Making
+          <br />
+          Good
+          <br />
+          Shits
+        </h1>
 
-      <motion.div
-        className="absolute bottom-12"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{
-          duration: 1,
-          delay: 0.8,
-          repeat: Infinity,
-          repeatType: "reverse",
-        }}
-      >
-        <svg
-          className="w-6 h-6 text-gray-400"
-          fill="none"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-        </svg>
-      </motion.div>
-    </motion.div>
+        {/* Glass cursor */}
+        <motion.div
+          className="absolute pointer-events-none rounded-full backdrop-blur-sm"
+          style={{
+            x: cursorX,
+            y: cursorY,
+            width: cursorSize,
+            height: cursorSize,
+            translateX: "-50%",
+            translateY: "-50%",
+            background: "rgba(255, 255, 255, 0.1)",
+            border: "1px solid rgba(255, 255, 255, 0.2)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            scale: 1.2,
+          }}
+        />
+      </div>
+
+      <div className="h-screen w-full">
+        <iframe
+          src="https://my.spline.design/untitled-d9bbb761f8b78c2a77b396afb35453cb/"
+          className="w-full h-full"
+          title="3D Model"
+        />
+      </div>
+    </div>
   );
 };
-
-export default HeroSection;
