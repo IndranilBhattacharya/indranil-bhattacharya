@@ -1,5 +1,5 @@
 // pages/index.tsx
-import PortfolioLayout from "@/components/Portfolio/Layout";
+import PortfolioLayout from "@/components/main/Layout";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NextPage } from "next";
 import Head from "next/head";

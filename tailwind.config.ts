@@ -64,12 +64,17 @@ export default {
   plugins: [
     tailwindcssAnimate,
     addVariablesForColors,
-    function ({ matchUtilities, theme }: any) {
+    function ({ matchUtilities, theme }) {
       matchUtilities(
         {
           "bg-dot-thick": (value: string) => ({
             backgroundImage: `url("${svgToDataUri(
-              `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="16" height="16" fill="none"><circle fill="${value}" id="pattern-circle" cx="10" cy="10" r="2.5"></circle></svg>`
+              `<svg xmlns="http://www.w3.org/2000/svg" 
+			   viewBox="0 0 32 32" width="16" height="16" 
+			   fill="none"><circle fill="${value}" 
+			   id="pattern-circle" cx="10" cy="10" r="2.5">
+			   </circle>
+			  </svg>`
             )}")`,
           }),
         },
@@ -80,7 +85,7 @@ export default {
 } satisfies Config;
 
 // This plugin adds each Tailwind color as a global CSS variable, e.g. var(--gray-200).
-function addVariablesForColors({ addBase, theme }: any) {
+function addVariablesForColors({ addBase, theme }) {
   const allColors = flattenColorPalette(theme("colors"));
   const newVars = Object.fromEntries(
     Object.entries(allColors).map(([key, val]) => [`--${key}`, val])

@@ -25,7 +25,6 @@ export const HeroSection = () => {
       <div
         ref={containerRef}
         className="relative h-full w-full flex items-center justify-center overflow-hidden"
-        onMouseMove={handleMouseMove}
       >
         {/* Text with magnifying glass effect */}
         <h1
@@ -43,23 +42,6 @@ export const HeroSection = () => {
           <br />
           Shits
         </h1>
-
-        {/* Glass cursor */}
-        <motion.div
-          className="absolute pointer-events-none rounded-full backdrop-blur-sm"
-          style={{
-            x: cursorX,
-            y: cursorY,
-            width: cursorSize,
-            height: cursorSize,
-            translateX: "-50%",
-            translateY: "-50%",
-            background: "rgba(255, 255, 255, 0.1)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-            scale: 1.2,
-          }}
-        />
       </div>
 
       <div className="h-screen w-full">

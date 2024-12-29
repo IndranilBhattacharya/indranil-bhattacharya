@@ -3,15 +3,7 @@ import { cn } from "@/lib/utils";
 import { useMotionValue, motion, useMotionTemplate } from "framer-motion";
 import React from "react";
 
-export const ProjectsSection = ({
-  children,
-  className,
-  containerClassName,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  containerClassName?: string;
-}) => {
+export default function ProjectsSection() {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -21,18 +13,16 @@ export const ProjectsSection = ({
     clientY,
   }: React.MouseEvent<HTMLDivElement>) {
     if (!currentTarget) return;
-    let { left, top } = currentTarget.getBoundingClientRect();
+    const { left, top } = currentTarget.getBoundingClientRect();
 
     mouseX.set(clientX - left);
     mouseY.set(clientY - top);
   }
+
   return (
     <div
-      className={cn(
-        "relative h-[40rem] flex items-center bg-background justify-center w-full group",
-        containerClassName
-      )}
       onMouseMove={handleMouseMove}
+      className="relative h-[40rem] flex items-center bg-background justify-center w-full group"
     >
       <div className="absolute inset-0 bg-dot-thick-neutral-300 dark:bg-dot-thick-neutral-800 pointer-events-none" />
       <motion.div
@@ -54,11 +44,11 @@ export const ProjectsSection = ({
           `,
         }}
       />
-      Hi this is <Highlight>highlight</Highlight>
-      <div className={cn("relative z-20", className)}>{children}</div>
+      {/* Hi this is <Highlight>highlight</Highlight> */}
+      {/* <div className={cn("relative z-20", className)}>{children}</div> */}
     </div>
   );
-};
+}
 
 export const Highlight = ({
   children,

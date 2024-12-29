@@ -2,11 +2,11 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
-import { HeroSection } from "./sections/HeroSection";
-import HorizontalScroll from "@/components/HorizontalScroll";
-import { ProjectsSection } from "./sections/ProjectsSection";
-import { SkillsSection } from "./sections/SkillsSection";
-import { TestimonialSection } from "./sections/TestimonialSection";
+import { HeroSection } from "../Portfolio/sections/HeroSection";
+// import HorizontalScroll from "@/components/HorizontalScroll";
+// import { ProjectsSection } from "../Portfolio/sections/ProjectsSection";
+// import { SkillsSection } from "../Portfolio/sections/SkillsSection";
+import { TestimonialSection } from "../Portfolio/sections/TestimonialSection";
 
 export const PortfolioLayout = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -27,12 +27,12 @@ export const PortfolioLayout = () => {
       </motion.section>
 
       {/* Horizontal Scroll Section */}
-      <section className="min-h-screen">
+      {/* <section className="min-h-screen">
         <HorizontalScroll />
-      </section>
+      </section> */}
 
       {/* Projects Section - Appears as horizontal scroll completes */}
-      <motion.section
+      {/* <motion.section
         className="relative min-h-screen bg-black py-20"
         style={{
           opacity: useTransform(scrollYProgress, [0.4, 0.5], [0, 1]),
@@ -42,10 +42,10 @@ export const PortfolioLayout = () => {
         <div className="max-w-7xl mx-auto px-6">
           <ProjectsSection />
         </div>
-      </motion.section>
+      </motion.section> */}
 
       {/* Skills Section */}
-      <motion.section
+      {/* <motion.section
         className="relative min-h-screen bg-gray-900 py-20"
         initial={{ opacity: 0, y: 100 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -55,7 +55,7 @@ export const PortfolioLayout = () => {
         <div className="max-w-7xl mx-auto px-6">
           <SkillsSection />
         </div>
-      </motion.section>
+      </motion.section> */}
 
       {/* Testimonials Section */}
       <motion.section
