@@ -66,16 +66,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-.mask-text {
-  -webkit-mask-image: radial-gradient(
-    circle at var(--x) var(--y),
-    black 25%,
-    transparent 75%
-  );
-  mask-image: radial-gradient(
-    circle at var(--x) var(--y),
-    black 25%,
-    transparent 75%
-  );
-}
