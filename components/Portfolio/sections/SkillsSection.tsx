@@ -1,6 +1,6 @@
 // components/Portfolio/sections/SkillsSection.tsx
+import { cn } from "@/lib/utils";
 import React, { useRef } from "react";
-import cn from "@/utils/cn";
 
 // Define our skill category type
 interface SkillCategory {

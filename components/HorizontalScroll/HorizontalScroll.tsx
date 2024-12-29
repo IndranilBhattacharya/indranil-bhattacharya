@@ -1,150 +1,107 @@
 // components/HorizontalScroll/HorizontalScroll.tsx
-import React, { useRef, useState, useEffect } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
-import cn from "@/utils/cn";
-
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { sections } from "./data";
-import { SectionContent } from "./SectionContent";
-import { ScrollTimeline } from "./ScrollTimeline";
+import { useSmoothScroll } from "@/hooks/useSmoothScroll";
+import { cn } from "@/lib/utils";
 
-// Register GSAP plugins in browser environment
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
-
-const HorizontalScroll: React.FC = () => {
-  // Track mounting state and scroll progress
-  const [isMounted, setIsMounted] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
-
-  // Create refs for our container elements
-  const wrapperRef = useRef<HTMLDivElement>(null);
+const HorizontalScroll = () => {
+  useSmoothScroll();
   const containerRef = useRef<HTMLDivElement>(null);
-  const sectionsRef = useRef<(HTMLDivElement | null)[]>([]);
 
-  // Initialize on mount
-  useEffect(() => {
-    setIsMounted(true);
-    sectionsRef.current = Array(sections.length).fill(null);
-  }, []);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
 
-  // Set up scroll animations after mount
-  useEffect(() => {
-    if (!isMounted || !wrapperRef.current || !containerRef.current) return;
+  // Main transforms
+  const x = useTransform(
+    scrollYProgress,
+    [0, 0.75],
+    ["0vw", `-${(sections.length - 1) * 100}vw`]
+  );
 
-    // Create animation context for better cleanup
-    const ctx = gsap.context(() => {
-      // Create the main scrolling timeline
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: wrapperRef.current,
-          pin: true, // Pin the section while scrolling horizontally
-          scrub: 1, // Smooth scrolling
-          start: "top top", // Start at the top of the section
-          end: () => {
-            // Calculate end point based on content width
-            const contentWidth = containerRef.current?.scrollWidth || 0;
-            const viewportWidth = window.innerWidth;
-            return `+=${contentWidth - viewportWidth}`;
-          },
-          invalidateOnRefresh: true, // Recalculate on resize
-          onUpdate: (self) => {
-            // Update scroll progress for timeline
-            setScrollProgress(self.progress);
-          },
-        },
-      });
+  const progressScale = useTransform(scrollYProgress, [0, 0.95], [0, 1]);
+  const progressOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.1, 0.85, 0.95],
+    [0, 1, 1, 0]
+  );
 
-      // Create the horizontal scrolling animation
-      tl.to(containerRef.current, {
-        x: () => {
-          // Calculate the exact distance to scroll
-          const contentWidth = containerRef.current?.scrollWidth || 0;
-          const viewportWidth = window.innerWidth;
-          return -(contentWidth - viewportWidth);
-        },
-        ease: "none", // Linear scrolling
-      });
-
-      // Animate content elements as they come into view
-      sectionsRef.current.forEach((section) => {
-        if (!section) return;
-
-        const elements = section.querySelectorAll(".animate-in");
-
-        gsap.fromTo(
-          elements,
-          {
-            opacity: 0,
-            y: 20,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            stagger: 0.2,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: section,
-              containerAnimation: tl,
-              start: "left center",
-              toggleActions: "play none none reset",
-            },
-          }
-        );
-      });
-    });
-
-    // Cleanup function
-    return () => ctx.revert();
-  }, [isMounted]);
-
-  // Helper function for setting section refs
-  const setSectionRef = (index: number) => (element: HTMLDivElement | null) => {
-    if (sectionsRef.current) {
-      sectionsRef.current[index] = element;
-    }
-  };
+  const backgroundX = useTransform(scrollYProgress, [0, 1], ["0%", "-20%"]);
+  const contentX = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
 
   return (
-    <div
-      ref={wrapperRef}
-      className="relative w-full overflow-hidden min-h-screen bg-black"
-    >
-      {/* Progress indicator */}
-      <ScrollTimeline progress={scrollProgress} />
+    <div ref={containerRef} className="relative h-[400vh]">
+      <div className="sticky top-0 h-screen overflow-hidden">
+        {/* Progress indicator */}
+        <motion.div
+          className="fixed top-8 left-1/2 w-1/2 h-1 bg-gray-800/20 -translate-x-1/2 rounded-full z-50"
+          style={{ opacity: progressOpacity }}
+        >
+          <motion.div
+            className="h-full w-full bg-white rounded-full origin-left"
+            style={{ scaleX: progressScale }}
+          />
+        </motion.div>
 
-      {/* Scrolling container */}
-      <div
-        ref={containerRef}
-        className={cn(
-          "flex h-full",
-          "transform will-change-transform",
-          "transition-opacity duration-500",
-          isMounted ? "opacity-100" : "opacity-0"
-        )}
-        style={{
-          width: `${sections.length * 100}vw`, // Total width based on number of sections
-          height: "100vh", // Full viewport height
-        }}
-      >
-        {sections.map((section, index) => (
-          <div
-            key={section.id}
-            ref={setSectionRef(index)}
-            className={cn(
-              "w-screen h-full", // Each section takes full viewport width
-              "flex items-center justify-center", // Center content
-              "px-20", // Horizontal padding
-              section.backgroundColor // Background color from section data
-            )}
-          >
-            <div className="relative">
-              <SectionContent section={section} isClient={isMounted} />
+        {/* Sections container */}
+        <motion.div
+          style={{ x }}
+          className="absolute top-0 left-0 h-full flex w-[300vw]"
+        >
+          {sections.map((section) => (
+            <div
+              key={section.id}
+              className={cn(
+                "relative w-screen h-full flex-shrink-0",
+                "flex items-center justify-center px-20",
+                section.backgroundColor
+              )}
+            >
+              {/* Background with parallax */}
+              <motion.div
+                className="absolute inset-0 opacity-10"
+                style={{ x: backgroundX }}
+              >
+                <div className="absolute inset-0 grid grid-cols-4 gap-4 p-8">
+                  {Array.from({ length: 16 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="rounded-full bg-white/5 aspect-square"
+                    />
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Content with counter-parallax */}
+              <motion.div
+                className="relative max-w-4xl"
+                style={{ x: contentX }}
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.8,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                  viewport={{ once: false, margin: "-25%" }}
+                >
+                  <h2
+                    className="text-6xl font-bold mb-6 bg-clip-text text-transparent 
+                             bg-gradient-to-r from-white to-white/50"
+                  >
+                    {section.title}
+                  </h2>
+                  <p className="text-xl text-white/80 leading-relaxed">
+                    {section.subtitle}
+                  </p>
+                </motion.div>
+              </motion.div>
             </div>
-          </div>
-        ))}
+          ))}
+        </motion.div>
       </div>
     </div>
   );
