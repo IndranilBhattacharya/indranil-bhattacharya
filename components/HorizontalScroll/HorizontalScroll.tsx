@@ -1,6 +1,6 @@
 // components/HorizontalScroll/HorizontalScroll.tsx
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "motion/react";
 import { sections } from "./data";
 import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 import { cn } from "@/lib/utils";

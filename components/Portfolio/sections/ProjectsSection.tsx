@@ -1,23 +1,23 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { useMotionValue, motion, useMotionTemplate } from "framer-motion";
+import { useMotionValue, motion, useMotionTemplate } from "motion/react";
 import React from "react";
 
 export default function ProjectsSection() {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  function handleMouseMove({
+  const handleMouseMove = ({
     currentTarget,
     clientX,
     clientY,
-  }: React.MouseEvent<HTMLDivElement>) {
+  }: React.MouseEvent<HTMLDivElement>) => {
     if (!currentTarget) return;
     const { left, top } = currentTarget.getBoundingClientRect();
 
     mouseX.set(clientX - left);
     mouseY.set(clientY - top);
-  }
+  };
 
   return (
     <div

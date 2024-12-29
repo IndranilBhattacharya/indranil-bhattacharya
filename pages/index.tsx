@@ -26,12 +26,8 @@ const Home: NextPage = () => {
           content="web development, creative developer, portfolio, interactive design"
         />
       </Head>
-      <nav className="fixed top-4 right-4">
-        <ThemeToggle />
-      </nav>
-      <main className="bg-background text-foreground min-h-screen">
-        <PortfolioLayout />
-      </main>
+      {/* <ThemeToggle /> */}
+      <PortfolioLayout />
     </>
   );
 };

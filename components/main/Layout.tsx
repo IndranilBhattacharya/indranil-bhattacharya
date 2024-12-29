@@ -1,65 +1,71 @@
-// components/Portfolio/Layout.tsx
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useMotionValue,
+  useMotionTemplate,
+} from "framer-motion";
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-
-import { HeroSection } from "../Portfolio/sections/HeroSection";
-// import HorizontalScroll from "@/components/HorizontalScroll";
-// import { ProjectsSection } from "../Portfolio/sections/ProjectsSection";
-// import { SkillsSection } from "../Portfolio/sections/SkillsSection";
+import HeroSection from "../Portfolio/sections/HeroSection";
 import { TestimonialSection } from "../Portfolio/sections/TestimonialSection";
 
-export const PortfolioLayout = () => {
+export default function Layout() {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll();
+  const { scrollYProgress } = useScroll({
+    target: scrollRef,
+    offset: ["start start", "end start"],
+  });
+
+  const handleMouseMove = ({
+    currentTarget,
+    clientX,
+    clientY,
+  }: React.MouseEvent<HTMLDivElement>) => {
+    const { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  };
 
   return (
-    <div ref={scrollRef} className="bg-black">
-      {/* Hero Section */}
-      <motion.section
-        className="min-h-screen flex items-center justify-center"
+    <main
+      ref={scrollRef}
+      onMouseMove={handleMouseMove}
+      className="relative w-full min-h-screen flex flex-col bg-background overflow-hidden"
+    >
+      <div className="absolute inset-0 bg-dot-thick-neutral-300 dark:bg-dot-thick-neutral-800 pointer-events-none" />
+
+      <motion.div
+        className="pointer-events-none bg-dot-thick-indigo-500 dark:bg-dot-thick-indigo-500 absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{
-          opacity: useTransform(scrollYProgress, [0, 0.2], [1, 0]),
-          scale: useTransform(scrollYProgress, [0, 0.2], [1, 0.8]),
-          y: useTransform(scrollYProgress, [0, 0.2], [0, -100]),
+          WebkitMaskImage: useMotionTemplate`radial-gradient(
+            200px circle at ${mouseX}px ${mouseY}px,
+            black 0%,
+            transparent 100%
+          )`,
+          maskImage: useMotionTemplate`radial-gradient(
+            200px circle at ${mouseX}px ${mouseY}px,
+            black 0%,
+            transparent 100%
+          )`,
+        }}
+      />
+
+      <motion.section
+        className="relative z-20 w-full h-screen flex items-center justify-center"
+        initial={{ opacity: 1, scale: 1, y: 0 }}
+        style={{
+          opacity: useTransform(scrollYProgress, [0, 0.2], [1, 0.5]),
+          scale: useTransform(scrollYProgress, [0, 0.2], [1, 0.9]),
+          y: useTransform(scrollYProgress, [0, 0.2], [0, -25]),
         }}
       >
         <HeroSection />
       </motion.section>
 
-      {/* Horizontal Scroll Section */}
-      {/* <section className="min-h-screen">
-        <HorizontalScroll />
-      </section> */}
-
-      {/* Projects Section - Appears as horizontal scroll completes */}
-      {/* <motion.section
-        className="relative min-h-screen bg-black py-20"
-        style={{
-          opacity: useTransform(scrollYProgress, [0.4, 0.5], [0, 1]),
-          y: useTransform(scrollYProgress, [0.4, 0.5], [100, 0]),
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-6">
-          <ProjectsSection />
-        </div>
-      </motion.section> */}
-
-      {/* Skills Section */}
-      {/* <motion.section
-        className="relative min-h-screen bg-gray-900 py-20"
-        initial={{ opacity: 0, y: 100 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false, margin: "-20%" }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="max-w-7xl mx-auto px-6">
-          <SkillsSection />
-        </div>
-      </motion.section> */}
-
-      {/* Testimonials Section */}
       <motion.section
-        className="relative min-h-screen bg-black py-20"
+        className="relative h-screen bg-black py-20"
         initial={{ opacity: 0, y: 100 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: false, margin: "-20%" }}
@@ -69,8 +75,6 @@ export const PortfolioLayout = () => {
           <TestimonialSection />
         </div>
       </motion.section>
-    </div>
+    </main>
   );
-};
-
-export default PortfolioLayout;
+}
