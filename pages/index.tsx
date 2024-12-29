@@ -1,5 +1,6 @@
 // pages/index.tsx
 import PortfolioLayout from "@/components/Portfolio/Layout";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NextPage } from "next";
 import Head from "next/head";
 
@@ -25,8 +26,10 @@ const Home: NextPage = () => {
           content="web development, creative developer, portfolio, interactive design"
         />
       </Head>
-
-      <main className="bg-black text-white">
+      <nav className="fixed top-4 right-4">
+        <ThemeToggle />
+      </nav>
+      <main className="bg-background text-foreground min-h-screen">
         <PortfolioLayout />
       </main>
     </>
