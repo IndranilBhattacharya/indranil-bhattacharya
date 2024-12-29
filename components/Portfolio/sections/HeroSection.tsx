@@ -4,6 +4,8 @@ import Spline from "@splinetool/react-spline";
 import { motion } from "motion/react";
 import { Highlight } from "./ProjectsSection";
 import StylizedButton from "@/components/ui/stylized-button";
+import { LinkPreview } from "@/components/ui/link-preview";
+import { myLinkedIn } from "@/constants/socials";
 
 const containerVariants = {
   visible: {
@@ -66,11 +68,27 @@ export default function HeroSection() {
         {/* Introduction text container */}
         <div className="overflow-hidden">
           <motion.p
-            className="text-xl text-foreground opacity-75 leading-tight tracking-normal max-w-2xl"
+            className="mt-2 text-xl text-secondary-foreground leading-tight tracking-normal max-w-2xl"
             variants={textVariants}
           >
-            Hi! I&apos;m Indranil Bhattacharya, Full-stack Developer & UI/UX
-            Designer bringing creative visions to life since 2019
+            Hi! I&apos;m{" "}
+            <LinkPreview
+              isStatic
+              url={myLinkedIn}
+              imageSrc="/images/me.webp"
+              previewText="This is me! 😁"
+              className="z-30 font-extrabold text-foreground"
+            >
+              Indranil Bhattacharya
+            </LinkPreview>
+            , Full-stack Developer & UI/UX Designer bringing creative visions to
+            life since{" "}
+            <LinkPreview
+              previewText="Time flies right? ⌛"
+              className="z-30 font-extrabold text-foreground"
+            >
+              2019
+            </LinkPreview>
           </motion.p>
         </div>
         <StylizedButton
