@@ -50,37 +50,21 @@ export default function ProjectsSection() {
   );
 }
 
-export const Highlight = ({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => {
+export const Highlight = ({ children }: { children: React.ReactNode }) => {
   return (
-    <motion.span
-      initial={{
-        backgroundSize: "0% 100%",
-      }}
-      animate={{
-        backgroundSize: "100% 100%",
-      }}
-      transition={{
-        duration: 2,
-        ease: "linear",
-        delay: 0.5,
-      }}
-      style={{
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "left center",
-        display: "inline",
-      }}
-      className={cn(
-        `relative inline-block pb-1   px-1 rounded-lg bg-gradient-to-r from-indigo-300 to-purple-300 dark:from-indigo-500 dark:to-purple-500`,
-        className
-      )}
-    >
-      {children}
+    <motion.span className="inline-block relative">
+      <span className="text-foreground">{children}</span>
+      <motion.span
+        className="absolute inset-0 text-accent dark:text-primary"
+        initial={{ clipPath: "inset(0 100% 0 0)" }}
+        animate={{ clipPath: "inset(0 0% 0 0)" }}
+        transition={{
+          duration: 3,
+          ease: "easeInOut",
+        }}
+      >
+        {children}
+      </motion.span>
     </motion.span>
   );
 };

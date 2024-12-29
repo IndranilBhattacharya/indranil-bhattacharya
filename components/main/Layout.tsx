@@ -8,10 +8,12 @@ import {
 import { useRef } from "react";
 import HeroSection from "../Portfolio/sections/HeroSection";
 import { TestimonialSection } from "../Portfolio/sections/TestimonialSection";
+import { ThemeToggle } from "../ui/theme-toggle";
 
 export default function Layout() {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: scrollRef,
@@ -29,11 +31,12 @@ export default function Layout() {
   };
 
   return (
-    <main
+    <div
       ref={scrollRef}
       onMouseMove={handleMouseMove}
-      className="relative w-full min-h-screen flex flex-col bg-background overflow-hidden"
+      className="group relative w-full min-h-screen flex flex-col bg-background overflow-hidden"
     >
+      <ThemeToggle />
       <div className="absolute inset-0 bg-dot-thick-neutral-300 dark:bg-dot-thick-neutral-800 pointer-events-none" />
 
       <motion.div
@@ -75,6 +78,6 @@ export default function Layout() {
           <TestimonialSection />
         </div>
       </motion.section>
-    </main>
+    </div>
   );
 }
