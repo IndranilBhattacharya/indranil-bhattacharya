@@ -37,10 +37,10 @@ export default function Layout() {
       className="group relative w-full min-h-screen flex flex-col bg-background overflow-hidden"
     >
       <ThemeToggle />
-      <div className="absolute inset-0 bg-dot-thick-neutral-300 dark:bg-dot-thick-neutral-800 pointer-events-none" />
 
+      <div className="absolute inset-0 bg-dot-thick-neutral-200 dark:bg-dot-thick-neutral-800 pointer-events-none" />
       <motion.div
-        className="pointer-events-none bg-dot-thick-indigo-500 dark:bg-dot-thick-indigo-500 absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        className="pointer-events-none bg-dot-thick-indigo-300 dark:bg-dot-thick-indigo-500 absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{
           WebkitMaskImage: useMotionTemplate`radial-gradient(
             200px circle at ${mouseX}px ${mouseY}px,

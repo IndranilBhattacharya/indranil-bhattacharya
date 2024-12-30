@@ -1,15 +1,17 @@
-// components/Portfolio/sections/HeroSection.tsx
-import React, { useCallback, WheelEvent, WheelEventHandler } from "react";
+import { motion, Variants } from "motion/react";
 import Spline from "@splinetool/react-spline";
-import { motion } from "motion/react";
-import { Highlight } from "./ProjectsSection";
-import StylizedButton from "@/components/ui/stylized-button";
-import { LinkPreview } from "@/components/ui/link-preview";
-import { myLinkedIn } from "@/constants/socials";
 
-const containerVariants = {
+import React, { useCallback, WheelEvent, WheelEventHandler } from "react";
+
+import { myLinkedIn } from "@/constants/socials";
+import TextHighlight from "@/components/ui/text-highlight";
+import { LinkPreview } from "@/components/ui/link-preview";
+import StylizedButton from "@/components/ui/stylized-button";
+
+const containerVariants: Variants = {
   visible: {
     transition: {
+      delayChildren: 1,
       staggerChildren: 0.3,
     },
   },
@@ -41,9 +43,9 @@ export default function HeroSection() {
   );
 
   return (
-    <main className="pl-8 pr-4 w-full h-screen grid grid-cols-2 overflow-hidden">
+    <main className="pl-24 pr-4 w-full h-screen grid grid-cols-2 overflow-hidden">
       <motion.div
-        className="flex flex-col justify-center px-12"
+        className="flex flex-col justify-center"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -51,18 +53,18 @@ export default function HeroSection() {
         {/* Main heading container */}
         <div className="overflow-hidden">
           <motion.h1
-            className="text-[5rem] font-bold leading-tight tracking-tight text-foreground"
+            className="text-[5.5rem] font-bold leading-tight tracking-tight text-foreground"
             variants={textVariants}
           >
-            Bridging <Highlight>Design</Highlight>
+            Bridging <TextHighlight delay={2}>Design</TextHighlight>
           </motion.h1>
         </div>
         <div className="overflow-hidden mb-4">
           <motion.h1
-            className="text-[5rem] font-bold leading-none tracking-tight text-foreground"
+            className="text-[5.5rem] font-bold leading-none tracking-tight text-foreground"
             variants={textVariants}
           >
-            & <Highlight>Development</Highlight>
+            & <TextHighlight>Development</TextHighlight>
           </motion.h1>
         </div>
         {/* Introduction text container */}
@@ -76,7 +78,7 @@ export default function HeroSection() {
               isStatic
               url={myLinkedIn}
               imageSrc="/images/me.webp"
-              previewText="This is me! 😁"
+              previewText="UI wizard at your service"
               className="z-30 font-extrabold text-foreground"
             >
               Indranil Bhattacharya
@@ -84,7 +86,7 @@ export default function HeroSection() {
             , Full-stack Developer & UI/UX Designer bringing creative visions to
             life since{" "}
             <LinkPreview
-              previewText="Time flies right? ⌛"
+              previewText="When I traded sleep for semicolons"
               className="z-30 font-extrabold text-foreground"
             >
               2019
@@ -103,10 +105,10 @@ export default function HeroSection() {
       {/* Right side for 3D content */}
       <div className="relative h-screen">
         <div className="absolute right-0 bottom-0 z-10 h-8 w-20 bg-black rounded"></div>
-        {/* <Spline
+        <Spline
           onWheel={wheelEventHandler}
           scene="https://prod.spline.design/C5mrs2sdu1PpdPXw/scene.splinecode"
-        /> */}
+        />
       </div>
     </main>
   );

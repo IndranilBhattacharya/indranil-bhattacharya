@@ -1,26 +1,29 @@
 "use client";
-import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
-import Image from "next/image";
-import { encode } from "qss";
-import React, { useState } from "react";
+
 import {
-  AnimatePresence,
   motion,
-  useMotionValue,
   useSpring,
+  useMotionValue,
+  AnimatePresence,
 } from "framer-motion";
+import { encode } from "qss";
+import { useState } from "react";
+
 import Link from "next/link";
+import Image from "next/image";
+
 import { cn } from "@/lib/utils";
+import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 
 type LinkPreviewProps = {
-  children: React.ReactNode;
   url?: string;
-  previewText?: string;
-  className?: string;
   width?: number;
   height?: number;
-  quality?: number;
   layout?: string;
+  quality?: number;
+  className?: string;
+  previewText?: string;
+  children: React.ReactNode;
 } & (
   | { isStatic: true; imageSrc: string }
   | { isStatic?: false; imageSrc?: never }
@@ -29,27 +32,27 @@ type LinkPreviewProps = {
 export const LinkPreview = ({
   children,
   url = "",
-  previewText,
   className,
+  previewText,
   width = 200,
   height = 125,
   quality = 50,
+  imageSrc = "",
   layout = "fixed",
   isStatic = false,
-  imageSrc = "",
 }: LinkPreviewProps) => {
   let src;
   if (!isStatic) {
     const params = encode({
       url,
-      screenshot: true,
       meta: false,
-      embed: "screenshot.url",
+      screenshot: true,
       colorScheme: "dark",
+      embed: "screenshot.url",
       "viewport.isMobile": true,
-      "viewport.deviceScaleFactor": 1,
       "viewport.width": width * 3,
       "viewport.height": height * 3,
+      "viewport.deviceScaleFactor": 1,
     });
     src = `https://api.microlink.io/?${params}`;
   } else {
@@ -57,11 +60,6 @@ export const LinkPreview = ({
   }
 
   const [isOpen, setIsOpen] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-
-  React.useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const springConfig = { stiffness: 100, damping: 15 };
   const x = useMotionValue(0);
@@ -76,101 +74,98 @@ export const LinkPreview = ({
   };
 
   return (
-    <>
-      {isMounted ? (
-        <div className="hidden">
-          <Image
-            src={src}
-            width={width}
-            height={height}
-            quality={quality}
-            layout={layout}
-            priority={true}
-            alt="hidden image"
-          />
-        </div>
-      ) : null}
-
-      <HoverCardPrimitive.Root
-        openDelay={50}
-        closeDelay={100}
-        onOpenChange={(open) => {
-          setIsOpen(open);
+    <HoverCardPrimitive.Root
+      openDelay={50}
+      closeDelay={100}
+      onOpenChange={(open) => {
+        setIsOpen(open);
+      }}
+    >
+      <HoverCardPrimitive.Trigger
+        target="_blank"
+        rel="noopener noreferrer"
+        href={url || "//"}
+        onMouseMove={handleMouseMove}
+        onClick={(event) => {
+          if (!url) event.preventDefault();
         }}
+        className={cn("text-black dark:text-white", className, {
+          "cursor-default": !url,
+        })}
       >
-        <HoverCardPrimitive.Trigger
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          onMouseMove={handleMouseMove}
-          className={cn("text-black dark:text-white", className)}
-        >
-          {children}
-        </HoverCardPrimitive.Trigger>
+        {children}
+      </HoverCardPrimitive.Trigger>
 
-        <HoverCardPrimitive.Content
-          side="top"
-          align="center"
-          sideOffset={10}
-          className="[transform-origin:var(--radix-hover-card-content-transform-origin)]"
-        >
-          <AnimatePresence>
-            {isOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: 20, scale: 0.6 }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  scale: 1,
-                  transition: {
-                    type: "spring",
-                    stiffness: 260,
-                    damping: 20,
-                  },
+      <HoverCardPrimitive.Content
+        side="top"
+        align="center"
+        sideOffset={10}
+        className="[transform-origin:var(--radix-hover-card-content-transform-origin)]"
+      >
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              animate={{
+                y: 0,
+                scale: 1,
+                opacity: 1,
+                transition: {
+                  damping: 20,
+                  type: "spring",
+                  stiffness: 260,
+                },
+              }}
+              initial={{ opacity: 0, y: 20, scale: 0.6 }}
+              exit={{ opacity: 0, y: 20, scale: 0.6 }}
+              style={{ x: translateX }}
+              className="shadow-xl rounded-xl"
+            >
+              <Link
+                target="_blank"
+                rel="noopener noreferrer"
+                href={url}
+                onClick={(event) => {
+                  if (!url) event.preventDefault();
                 }}
-                exit={{ opacity: 0, y: 20, scale: 0.6 }}
-                className="shadow-xl rounded-xl"
-                style={{ x: translateX }}
+                className="block p-1 bg-white border-2 border-transparent shadow rounded-xl hover:border-neutral-200 dark:hover:border-neutral-800 dark:bg-background"
+                style={{
+                  fontSize: 0,
+                  maxWidth: !isStatic && !imageSrc ? "20vw" : "auto",
+                }}
               >
-                <Link
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block p-1 bg-white border-2 border-transparent shadow rounded-xl hover:border-neutral-200 dark:hover:border-neutral-800 dark:bg-background"
-                  style={{
-                    fontSize: 0,
-                    maxWidth: !isStatic && !imageSrc ? "12.5vw" : "auto",
-                  }}
-                >
-                  {!isStatic && !imageSrc ? (
-                    <div className="p-4 text-sm text-foreground whitespace-pre-wrap">
-                      {previewText}
-                    </div>
-                  ) : (
-                    <>
-                      <Image
-                        src={isStatic ? imageSrc : src}
-                        width={width}
-                        height={height}
-                        quality={quality}
-                        layout={layout}
-                        priority={true}
-                        className="rounded-lg"
-                        alt="preview image"
-                      />
-                      {previewText && (
-                        <div className="p-2 text-sm text-foreground whitespace-pre-wrap">
-                          {previewText}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </Link>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </HoverCardPrimitive.Content>
-      </HoverCardPrimitive.Root>
-    </>
+                {!isStatic && !imageSrc ? (
+                  <div
+                    className={cn(
+                      "p-4 text-base text-foreground whitespace-pre-wrap",
+                      { "font-bold": !url }
+                    )}
+                  >
+                    {previewText}
+                  </div>
+                ) : (
+                  <>
+                    <Image
+                      src={isStatic ? imageSrc : src}
+                      width={width}
+                      height={height}
+                      quality={quality}
+                      layout={layout}
+                      priority={true}
+                      className="rounded-lg"
+                      alt="preview image"
+                    />
+                    {previewText && (
+                      <div className="p-2 text-sm text-foreground whitespace-pre-wrap">
+                        {previewText}
+                      </div>
+                    )}
+                  </>
+                )}
+              </Link>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </HoverCardPrimitive.Content>
+    </HoverCardPrimitive.Root>
   );
 };
