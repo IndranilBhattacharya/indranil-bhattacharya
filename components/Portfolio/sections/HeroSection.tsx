@@ -1,5 +1,5 @@
-import { motion, Variants } from "motion/react";
 import Spline from "@splinetool/react-spline";
+import { motion, Variants } from "motion/react";
 
 import React, { useCallback, WheelEvent, WheelEventHandler } from "react";
 

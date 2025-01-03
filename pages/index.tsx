@@ -1,8 +1,10 @@
 // pages/index.tsx
-import Layout from "@/components/main/Layout";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { NextPage } from "next";
 import Head from "next/head";
+import { NextPage } from "next";
+
+import Layout from "@/components/main/Layout";
+import SplashScreen from "@/components/SplashScreen";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const Home: NextPage = () => {
   return (
@@ -27,7 +29,8 @@ const Home: NextPage = () => {
         />
       </Head>
 
-      <Layout />
+      {/* <Layout /> */}
+      <SplashScreen />
     </>
   );
 };
